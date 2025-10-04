@@ -51,12 +51,27 @@ export const AuthProvider = ({ children }) => {
     return user?.role === 'Admin';
   };
 
+  const isManager = () => {
+    return user?.role === 'Manager';
+  };
+
+  const isEmployee = () => {
+    return user?.role === 'Employee';
+  };
+
+  const canManageExpenses = () => {
+    return user?.role === 'Admin' || user?.role === 'Manager';
+  };
+
   const value = {
     user,
     login,
     logout,
     isAuthenticated,
     isAdmin,
+    isManager,
+    isEmployee,
+    canManageExpenses,
     loading,
   };
 

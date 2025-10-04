@@ -49,4 +49,23 @@ export const userAPI = {
   generatePassword: (data) => api.post('/users/generate-password', data),
 };
 
+// Expense APIs
+export const expenseAPI = {
+  submit: (data) => api.post('/expenses/submit', data),
+  getMyExpenses: () => api.get('/expenses/my-expenses'),
+  getPendingApprovals: () => api.get('/expenses/pending-approvals'),
+  approve: (expenseId, data) => api.put(`/expenses/approve/${expenseId}`, data),
+  getAll: () => api.get('/expenses/all'),
+  getCategories: () => api.get('/expenses/categories'),
+  getCurrencies: () => api.get('/expenses/currencies'),
+  getPaymentMethods: () => api.get('/expenses/payment-methods'),
+};
+
+// Admin APIs
+export const adminAPI = {
+  setApprovalChain: (data) => api.post('/admin/approval-chain', data),
+  getApprovalChain: () => api.get('/admin/approval-chain'),
+  getExpenseStats: () => api.get('/admin/expenses/stats'),
+};
+
 export default api;

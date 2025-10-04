@@ -43,9 +43,11 @@ def create_app():
     # Register blueprints
     from app.routes.auth import auth_bp
     from app.routes.users import users_bp
+    from app.routes.expense import expenses_bp
     
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(users_bp, url_prefix='/users')
+    app.register_blueprint(expenses_bp, url_prefix='/expenses')
     
     @app.route('/')
     def health_check():
