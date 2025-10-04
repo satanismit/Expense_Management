@@ -1,213 +1,209 @@
-# 💰 Expense Management System
+# Expense Management System
 
-A complete full-stack application built to simplify and automate the process of tracking, submitting, and approving expenses in an organization.  
-The system ensures role-based access, efficient approval workflows, and secure management of employee expenses.
-
----
-
-## 📘 Problem Statement
-**Name:** Expense Management  
-To develop an Expense Management System that allows employees to submit expenses, managers to review and approve them, and admins to manage the approval flow and overall system.
+A full-stack web application designed to simplify expense tracking, submission, and approval across organizational roles.  
+Built with a **Flask (Python)** backend, **React.js** frontend, and **MongoDB** database, it supports secure, scalable, and role-based expense workflows.
 
 ---
 
-## 👥 Team Details
+## 📘 Overview
 
-**Team Name:** SquareOps  
+### Problem Statement
+To build an Expense Management System that enables employees to submit expenses, managers to review and approve them, and admins to configure approval hierarchies and oversee all operations.
 
+### Team
 | Role | Name |
 |------|------|
-| 🧑‍💻 Team Leader | **Smit Satani** |
-| 👩‍💻 Member 2 | **Preet Rank** |
-| 👨‍💻 Member 3 | **Krish Vaghnani** |
+| Team Leader | **Smit Satani** |
+| Member | **Preet Rank** |
+| Member | **Krish Vaghnani** |
+
+**Reviewer:** Aman Patel  
+**Team Name:** SquareOps  
 
 ---
 
-## 🧑‍🏫 Reviewer Details
+## ⚙️ Features
 
-**Reviewer Name:** Aman Patel  
+### Role-Based Access
+- **Admin:** Manage users, system settings, and approval hierarchies.  
+- **Manager:** Review and approve expenses assigned by admin.  
+- **Employee:** Submit and track personal expenses (only employees can add expenses).
 
----
-
-## 🎥 Video Presentation
-
-**Video Link:** *(To be added after coding ends)*  
-🔗 [Click here to view the project demo](#)
-
----
-
-## 🚀 Features
-
-### 👩‍💼 Role-Based Access Control
-- **Admin:**  
-  - Can view all expenses.  
-  - Can configure approval hierarchies (Manager, Director, etc.).  
-  - Can select who approves each expense (e.g., Manager, Director).  
-
-- **Manager:**  
-  - Can view expense requests if selected by admin for approval.  
-  - Can approve or reject expenses assigned to them.  
-
-- **Employee:**  
-  - Can **add expenses only** (no other role can add).  
-  - Can view the status of their submitted expenses.  
+### Key Highlights
+- JWT-based Authentication  
+- Approval Workflow Configuration  
+- Role-based Dashboards  
+- Expense Analytics & Reports  
+- Modular Codebase with Flask Blueprints  
 
 ---
 
-## ⚙️ Tech Stack
+## 🛠️ Tech Stack
 
-**Frontend:**
-- React.js / HTML / CSS / JavaScript
-- Tailwind CSS (for styling)
-
-**Backend:**
-- FastAPI (Python)
-- JWT Authentication
-- Role-based API access
-
-**Database:**
-- MongoDB
-
-**Version Control:**
-- Git & GitHub
+**Frontend:** React.js, Tailwind CSS  
+**Backend:** Flask, Python, JWT Authentication  
+**Database:** MongoDB  
+**Version Control:** Git & GitHub  
 
 ---
 
-## 🏗️ Project Modules
-
-| Module | Description |
-|---------|-------------|
-| **Authentication** | Secure login and signup with JWT tokens |
-| **Expense Management** | Employees add expenses, Managers/Admins view and manage them |
-| **Approval Workflow** | Multi-level approval setup controlled by Admin |
-| **Dashboard** | Role-based dashboards for Employees, Managers, and Admins |
-| **Notifications** | Expense status updates (Approved/Rejected) |
-
----
-
-## 📦 Folder Structure
+## 📂 Folder Structure
 
 ```
 Expense_Management/
 ├── backend/
-│   ├── main.py
-│   ├── routes/
-│   │   ├── auth.py
-│   │   ├── expense.py
-│   │   └── approval.py
-│   ├── models/
-│   └── database.py
+│   ├── app/
+│   │   ├── __init__.py             # Flask app factory
+│   │   ├── models.py               # MongoDB models
+│   │   └── routes/
+│   │       ├── auth.py             # Authentication APIs
+│   │       ├── users.py            # User management APIs
+│   │       ├── expense.py          # Expense management APIs
+│   │       └── admin.py            # Admin configuration APIs
+│   ├── .env                        # Environment variables
+│   └── run.py                      # Application entry point
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── public/
-│   └── package.json
-│
-└── README.md
+└── frontend/
+    ├── src/
+    │   ├── components/             # UI Components
+    │   ├── context/                # Auth Context
+    │   ├── pages/                  # Dashboard, Login, Signup, etc.
+    │   ├── services/               # API layer
+    │   ├── styles/                 # CSS files
+    │   └── utils/                  # Helper utilities
+    └── public/
 ```
 
 ---
 
 ## ⚡ Installation & Setup
 
-### 1. Clone the Repository
-
+### 1. Clone Repository
 ```bash
 git clone https://github.com/satanismit/Expense_Management.git
 cd Expense_Management
 ```
 
-### 2. Setup Backend
-
+### 2. Backend Setup
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn main:app --reload
+python run.py
 ```
+Backend runs at → `http://localhost:8000`
 
-Backend runs on:  
-👉 `http://localhost:8000`
-
-### 3. Setup Frontend
-
+### 3. Frontend Setup
 ```bash
 cd frontend
 npm install
 npm start
 ```
-
-Frontend runs on:  
-👉 `http://localhost:3000`
+Frontend runs at → `http://localhost:3000`
 
 ---
 
-## 🧠 Usage Flow
+## 🔐 API Endpoints Overview
 
-1. **Admin Login**
-   - Create approval roles (Manager, Director, etc.)
-   - Assign who approves expenses
-
-2. **Employee**
-   - Add new expenses (only employees can add)
-   - View submitted expenses
-
-3. **Manager**
-   - If selected by admin, sees expenses awaiting approval
-   - Can approve or reject them
-
-4. **Admin**
-   - Can view all expenses
-   - Can monitor status and approval hierarchy
+### Authentication Routes (`/auth`)
+| Method | Endpoint | Description | Access |
+|--------|-----------|--------------|---------|
+| POST | `/auth/register` | Register new user | Public |
+| POST | `/auth/login` | User login | Public |
+| POST | `/auth/forgot-password` | Request password reset | Public |
+| POST | `/auth/reset-password` | Reset password | Public |
+| POST | `/auth/logout` | Logout | Authenticated |
+| GET | `/auth/profile` | Get current user profile | Authenticated |
+| PUT | `/auth/profile` | Update user profile | Authenticated |
 
 ---
 
-## 🧩 API Overview
-
-| Endpoint | Method | Description | Access |
-|-----------|--------|--------------|---------|
-| `/auth/login` | POST | User login | All |
-| `/auth/register` | POST | Register employee/manager/admin | Admin |
-| `/expense/add` | POST | Add expense | Employee |
-| `/expense/list` | GET | View all expenses | Admin |
-| `/expense/pending` | GET | View pending approvals | Manager |
-| `/expense/approve/{id}` | PUT | Approve expense | Manager/Admin |
-| `/expense/reject/{id}` | PUT | Reject expense | Manager/Admin |
-
----
-
-## 🛡️ Security Features
-
-- JWT Authentication  
-- Role-based Access Control  
-- Input Validation  
-- Secure Database Queries  
-- Protected Routes  
+### User Management Routes (`/users`)
+| Method | Endpoint | Description | Access |
+|--------|-----------|--------------|---------|
+| GET | `/users` | Get all users | Admin |
+| POST | `/users` | Create new user | Admin |
+| GET | `/users/<user_id>` | Get user details | Admin/Self |
+| PUT | `/users/<user_id>` | Update user | Admin |
+| DELETE | `/users/<user_id>` | Delete user | Admin |
+| GET | `/users/managers` | List all managers | Admin/Manager |
+| POST | `/users/<user_id>/assign-manager` | Assign manager to user | Admin |
+| GET | `/users/subordinates` | Get subordinates of a manager | Manager |
 
 ---
 
-## 🧩 Future Enhancements
+### Expense Management Routes (`/expenses`)
+| Method | Endpoint | Description | Access |
+|--------|-----------|--------------|---------|
+| GET | `/expenses` | Get all expenses | Admin/Manager |
+| POST | `/expenses` | Create expense | Employee |
+| GET | `/expenses/my-expenses` | Get own expenses | Employee |
+| GET | `/expenses/<expense_id>` | Get specific expense | Owner/Manager/Admin |
+| PUT | `/expenses/<expense_id>` | Update expense | Owner/Admin |
+| DELETE | `/expenses/<expense_id>` | Delete expense | Owner/Admin |
+| GET | `/expenses/pending-approvals` | Get pending approvals | Manager |
+| POST | `/expenses/<expense_id>/approve` | Approve expense | Manager |
+| POST | `/expenses/<expense_id>/reject` | Reject expense | Manager |
+| GET | `/expenses/reports` | Generate reports | Manager/Admin |
+| GET | `/expenses/analytics` | Expense analytics | Manager/Admin |
 
-- Email or WhatsApp notifications for expense updates  
-- Expense analytics dashboard (charts, graphs)  
-- PDF export for approved expenses  
-- Integration with Google Sheets or accounting software  
+---
+
+### Admin Routes (`/admin`)
+| Method | Endpoint | Description | Access |
+|--------|-----------|--------------|---------|
+| GET | `/admin/approval-chain` | Get approval chain | Admin |
+| POST | `/admin/approval-chain` | Set approval chain | Admin |
+| GET | `/admin/system-settings` | Get system configs | Admin |
+| POST | `/admin/system-settings` | Update system configs | Admin |
+| GET | `/admin/categories` | Get expense categories | Admin |
+| POST | `/admin/categories` | Create category | Admin |
+| PUT | `/admin/categories/<id>` | Update category | Admin |
+| DELETE | `/admin/categories/<id>` | Delete category | Admin |
+
+---
+
+### Miscellaneous
+| Method | Endpoint | Description | Access |
+|--------|-----------|-------------|---------|
+| GET | `/` | Health check | Public |
+
+---
+
+## 🧠 Access Control
+
+| Role | Permissions |
+|------|--------------|
+| **Public** | Login, Register, Password Reset, Health Check |
+| **Employee** | Add/view own expenses, update profile |
+| **Manager** | Approve/reject subordinates’ expenses, view reports |
+| **Admin** | Manage users, system settings, categories, approvals |
+
+---
+
+## ⚙️ Configuration
+
+**CORS**
+- Allowed Origins: `localhost:3000`, `127.0.0.1:3000`, `localhost:5173`  
+- Allowed Headers: `Content-Type`, `Authorization`  
+- Allowed Methods: `GET`, `POST`, `PUT`, `DELETE`, `OPTIONS`
+
+**MongoDB Collections**
+- `users` – User data  
+- `expenses` – Expense records  
+- `approval_settings` – Approval hierarchies  
+- `categories` – Expense categories  
+- `system_settings` – Global configurations  
+
+---
+
+## 🚀 Future Enhancements
+- Email/WhatsApp notifications  
+- Expense analytics dashboard  
+- PDF exports for reports  
+- Google Sheets or ERP integration  
 
 ---
 
 ## 📄 License
-
-This project is created by **SquareOps Team** for academic and educational purposes.  
-All rights reserved © 2025.
-
----
-
-## 🙏 Acknowledgements
-
-Special thanks to our reviewer **Aman Patel** for guidance, review, and support throughout the project development.
-
----
+Created by **SquareOps Team** © 2025  
+For academic and educational purposes.
