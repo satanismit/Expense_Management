@@ -90,7 +90,7 @@ cd backend
 pip install -r requirements.txt
 python run.py
 ```
-Backend runs at → `http://localhost:8000`
+Backend runs at → `http://localhost:5000`
 
 ### 3. Frontend Setup
 ```bash
@@ -98,7 +98,7 @@ cd frontend
 npm install
 npm start
 ```
-Frontend runs at → `http://localhost:3000`
+Frontend runs at → `http://localhost:5173`
 
 ---
 
