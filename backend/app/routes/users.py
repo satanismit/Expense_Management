@@ -1,7 +1,10 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_mail import Message
 from bson import ObjectId
-from app import mongo
+import string
+import random
+from app import mongo, mail
 from app.models import User
 
 users_bp = Blueprint('users', __name__)
@@ -245,6 +248,97 @@ def get_managers():
             manager['_id'] = str(manager['_id'])
         
         return jsonify({'managers': managers}), 200
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@users_bp.route('/generate-password', methods=['POST'])
+@jwt_required()
+def generate_password():
+    try:
+        current_user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        # Get current user
+        current_user = mongo.db.users.find_one({'_id': ObjectId(current_user_id)})
+        if not current_user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Check if user is admin
+        if current_user['role'] != 'Admin':
+            return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
+        
+        # Validate required fields
+        if 'user_id' not in data:
+            return jsonify({'error': 'user_id is required'}), 400
+        
+        user_id = data['user_id']
+        
+        # Find target user
+        target_user = mongo.db.users.find_one({
+            '_id': ObjectId(user_id),
+            'company_id': current_user['company_id']
+        })
+        if not target_user:
+            return jsonify({'error': 'User not found or not in your company'}), 404
+        
+        # Generate random password (12 characters with letters, numbers, and special chars)
+        password_chars = string.ascii_letters + string.digits + "!@#$%&*"
+        new_password = ''.join(random.choices(password_chars, k=12))
+        
+        # Update password in database
+        hashed_password = User.set_password(new_password)
+        mongo.db.users.update_one(
+            {'_id': ObjectId(user_id)},
+            {'$set': {'password_hash': hashed_password}}
+        )
+        
+        # Try sending email, fallback to console if email fails
+        try:
+            # Get company info for email
+            company = mongo.db.companies.find_one({'_id': current_user['company_id']})
+            company_name = company['name'] if company else 'Your Company'
+            
+            msg = Message(
+                subject=f'New Password - {company_name}',
+                recipients=[target_user['email']],
+                body=f'''
+Hello {target_user['name']},
+
+A new password has been generated for your account by your administrator.
+
+Your new login credentials are:
+Email: {target_user['email']}
+Password: {new_password}
+
+Please log in with these credentials and consider changing your password to something more memorable.
+
+Company: {company_name}
+
+Best regards,
+{company_name} Admin Team
+                '''
+            )
+            
+            mail.send(msg)
+            
+            return jsonify({
+                'message': f'New password has been generated and sent to {target_user["email"]}'
+            }), 200
+            
+        except Exception as email_error:
+            # If email fails, log to console as fallback
+            print("=" * 60)
+            print(f"🔑 EMAIL FAILED - NEW PASSWORD FOR: {target_user['email']}")
+            print(f"🔑 NEW PASSWORD: {new_password}")
+            print(f"🔑 EMAIL ERROR: {email_error}")
+            print("=" * 60)
+            
+            return jsonify({
+                'message': f'New password generated for {target_user["name"]}. Check the server console for the password.',
+                'note': 'Email service temporarily unavailable.'
+            }), 200
     
     except Exception as e:
         return jsonify({'error': str(e)}), 500
