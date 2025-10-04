@@ -46,6 +46,7 @@ export const userAPI = {
   updateRole: (data) => api.put('/users/update-role', data),
   assignManager: (data) => api.put('/users/assign-manager', data),
   getManagers: () => api.get('/users/managers'),
+  generatePassword: (data) => api.post('/users/generate-password', data),
 };
 
 export default api;

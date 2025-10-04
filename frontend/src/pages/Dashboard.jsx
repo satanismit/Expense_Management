@@ -4,11 +4,35 @@ import { userAPI } from '../services/api';
 
 const Dashboard = () => {
   const [users, setUsers] = useState([]);
-  const [managers, setManagers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [managers, setManagers] = useState([]);  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: 'Employee',
+    manager_id: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [modalError, setModalError] = useState('');
+  const [generateRandomPassword, setGenerateRandomPassword] = useState(false);
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
+
+  const handleGeneratePasswordInModal = () => {
+    const newPassword = generatePassword();
+    setFormData({ ...formData, password: newPassword });
+  }; [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
+  const [generatingPassword, setGeneratingPassword] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const { user, logout } = useAuth();
 
@@ -62,6 +86,30 @@ const Dashboard = () => {
     }
   };
 
+  const handleGeneratePassword = async (userId, userName, userEmail) => {
+    if (!window.confirm(`Generate a new password for ${userName} (${userEmail})?\n\nThis will send the new password to their email address.`)) {
+      return;
+    }
+
+    setGeneratingPassword(userId);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      const response = await userAPI.generatePassword({ user_id: userId });
+      setSuccessMessage(response.data.message);
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
+    } catch (error) {
+      setError(error.response?.data?.error || 'Failed to generate password');
+    } finally {
+      setGeneratingPassword(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -110,6 +158,12 @@ const Dashboard = () => {
           </div>
         )}
 
+        {successMessage && (
+          <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+            {successMessage}
+          </div>
+        )}
+
         {/* Users Table */}
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <div className="px-4 py-5 sm:px-6">
@@ -117,7 +171,7 @@ const Dashboard = () => {
               Team Members
             </h3>
             <p className="mt-1 max-w-2xl text-sm text-gray-500">
-              Manage roles and reporting structure for your team.
+              Manage roles and reporting structure for your team. Use the "Generate Password" button to create and send new login credentials to users via email.
             </p>
           </div>
           <div className="border-t border-gray-200">
@@ -139,6 +193,9 @@ const Dashboard = () => {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Password
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
                     </th>
                   </tr>
                 </thead>
@@ -181,6 +238,28 @@ const Dashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         ••••••••
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <button
+                          onClick={() => handleGeneratePassword(usr._id, usr.name, usr.email)}
+                          disabled={generatingPassword === usr._id}
+                          className="inline-flex items-center px-3 py-1 border border-transparent text-xs leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Generate and send new password to user's email"
+                        >
+                          {generatingPassword === usr._id ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Sending...
+                            </>
+                          ) : (
+                            <>
+                              🔑 Generate Password
+                            </>
+                          )}
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -221,7 +300,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
+    setModalError('');
 
     try {
       const submitData = {
@@ -231,7 +310,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
       await userAPI.create(submitData);
       onUserCreated();
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to create user');
+      setModalError(error.response?.data?.error || 'Failed to create user');
     } finally {
       setLoading(false);
     }
@@ -243,9 +322,9 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
         <div className="mt-3">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Add New User</h3>
           
-          {error && (
+          {modalError && (
             <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error}
+              {modalError}
             </div>
           )}
 
@@ -274,13 +353,35 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
             
             <div>
               <label className="block text-sm font-medium text-gray-700">Password</label>
-              <input
-                type="password"
-                required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
+              <div className="mt-1 flex rounded-md shadow-sm">
+                <input
+                  type={generateRandomPassword ? "text" : "password"}
+                  required
+                  className="flex-1 min-w-0 block w-full border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder={generateRandomPassword ? "Click generate to create password" : "Enter password"}
+                />
+                <button
+                  type="button"
+                  onClick={handleGeneratePasswordInModal}
+                  className="inline-flex items-center px-3 py-2 border border-l-0 border-gray-300 rounded-r-md bg-gray-50 text-gray-500 text-sm hover:bg-gray-100"
+                  title="Generate random password"
+                >
+                  🎲
+                </button>
+              </div>
+              <div className="mt-2">
+                <label className="inline-flex items-center">
+                  <input
+                    type="checkbox"
+                    className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                    checked={generateRandomPassword}
+                    onChange={(e) => setGenerateRandomPassword(e.target.checked)}
+                  />
+                  <span className="ml-2 text-sm text-gray-600">Show generated password</span>
+                </label>
+              </div>
             </div>
             
             <div>
