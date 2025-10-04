@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navigation = () => {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   const isActive = (path) => {
@@ -35,11 +35,11 @@ const Navigation = () => {
       );
     }
 
-    if (['Manager', 'Admin'].includes(user?.role)) {
+    if (user?.role === 'Manager') {
       links.push({
         path: '/pending-approvals',
         label: 'Pending Approvals',
-        roles: ['Manager', 'Admin']
+        roles: ['Manager']
       });
     }
 

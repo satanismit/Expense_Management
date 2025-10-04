@@ -25,18 +25,32 @@ def set_approval_chain():
             return jsonify({'error': 'Access denied. Admin privileges required.'}), 403
         
         # Validate required fields
-        if 'chain' not in data:
-            return jsonify({'error': 'chain is required'}), 400
+        if 'approvers' not in data:
+            return jsonify({'error': 'approvers is required'}), 400
         
-        chain = data['chain']
-        if not isinstance(chain, list):
-            return jsonify({'error': 'chain must be a list'}), 400
+        approvers = data['approvers']
+        if not isinstance(approvers, list):
+            return jsonify({'error': 'approvers must be a list'}), 400
         
-        # Validate chain roles
-        valid_roles = ['Manager', 'Director']
-        for role in chain:
-            if role not in valid_roles:
-                return jsonify({'error': f'Invalid role: {role}. Must be one of: {valid_roles}'}), 400
+        # Validate approvers structure
+        for i, approver in enumerate(approvers):
+            if not isinstance(approver, dict):
+                return jsonify({'error': f'Approver {i+1} must be an object'}), 400
+            
+            if 'user_id' not in approver or 'order' not in approver:
+                return jsonify({'error': f'Approver {i+1} must have user_id and order fields'}), 400
+            
+            # Validate user exists and is in same company
+            user = mongo.db.users.find_one({
+                '_id': ObjectId(approver['user_id']),
+                'company_id': current_user['company_id']
+            })
+            if not user:
+                return jsonify({'error': f'User ID {approver["user_id"]} not found in your company'}), 400
+            
+            # Validate user role (should be Manager or Admin)
+            if user['role'] not in ['Manager', 'Admin']:
+                return jsonify({'error': f'User {user["name"]} must be a Manager or Admin to be an approver'}), 400
         
         # Check if approval chain already exists for this company
         existing_chain = mongo.db.approval_chains.find_one({'company_id': current_user['company_id']})
@@ -45,21 +59,23 @@ def set_approval_chain():
             # Update existing chain
             mongo.db.approval_chains.update_one(
                 {'company_id': current_user['company_id']},
-                {'$set': {'chain': chain, 'updated_at': datetime.utcnow()}}
+                {'$set': {'approvers': approvers, 'updated_at': datetime.utcnow()}}
             )
-            message = 'Approval chain updated successfully'
+            message = 'Approval settings updated successfully'
         else:
             # Create new chain
-            new_chain = ApprovalChain(
-                company_id=current_user['company_id'],
-                chain=chain
-            )
-            mongo.db.approval_chains.insert_one(new_chain.to_dict())
-            message = 'Approval chain created successfully'
+            new_chain = {
+                'company_id': current_user['company_id'],
+                'approvers': approvers,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            }
+            mongo.db.approval_chains.insert_one(new_chain)
+            message = 'Approval settings created successfully'
         
         return jsonify({
             'message': message,
-            'chain': chain
+            'approvers': approvers
         }), 200
     
     except Exception as e:
@@ -86,13 +102,22 @@ def get_approval_chain():
         
         if not approval_chain:
             return jsonify({
-                'message': 'No approval chain set for this company',
-                'chain': []
+                'message': 'No approval settings configured for this company',
+                'approvers': []
             }), 200
         
         # Convert ObjectId to string
         approval_chain['_id'] = str(approval_chain['_id'])
         approval_chain['company_id'] = str(approval_chain['company_id'])
+        
+        # Convert approver user_ids to strings and get user details
+        approvers = approval_chain.get('approvers', [])
+        for approver in approvers:
+            if 'user_id' in approver:
+                user = mongo.db.users.find_one({'_id': ObjectId(approver['user_id'])})
+                approver['user_id'] = str(approver['user_id'])
+                approver['user_name'] = user['name'] if user else 'Unknown'
+                approver['user_email'] = user['email'] if user else 'Unknown'
         
         # Convert timestamps
         if isinstance(approval_chain.get('created_at'), datetime):
@@ -101,7 +126,7 @@ def get_approval_chain():
             approval_chain['updated_at'] = approval_chain['updated_at'].isoformat()
         
         return jsonify({
-            'chain': approval_chain['chain'],
+            'approvers': approvers,
             'created_at': approval_chain.get('created_at'),
             'updated_at': approval_chain.get('updated_at')
         }), 200

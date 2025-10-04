@@ -74,10 +74,22 @@ def submit_expense():
         except ValueError:
             return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
         
-        # Determine approver (manager for now)
-        approver_id = current_user.get('manager_id')
-        if not approver_id:
-            return jsonify({'error': 'No manager assigned. Contact admin to assign a manager.'}), 400
+        # Determine approver based on approval settings
+        # First, check if there are approval settings configured
+        approval_settings = mongo.db.approval_chains.find_one({'company_id': current_user['company_id']})
+        
+        if approval_settings and approval_settings.get('approvers'):
+            # Use the first approver in the approval chain
+            approvers = approval_settings['approvers']
+            # Sort by order to get the first approver
+            approvers.sort(key=lambda x: x.get('order', 0))
+            first_approver = approvers[0]
+            approver_id = ObjectId(first_approver['user_id'])
+        else:
+            # Fallback to employee's assigned manager
+            approver_id = current_user.get('manager_id')
+            if not approver_id:
+                return jsonify({'error': 'No approval settings configured and no manager assigned. Contact admin to configure approval settings or assign a manager.'}), 400
         
         # Create expense
         expense = Expense(
@@ -147,9 +159,9 @@ def get_pending_approvals():
         if not current_user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Check if user is manager or admin
-        if current_user['role'] not in ['Manager', 'Admin']:
-            return jsonify({'error': 'Access denied. Manager or Admin privileges required.'}), 403
+        # Check if user is manager
+        if current_user['role'] != 'Manager':
+            return jsonify({'error': 'Access denied. Manager privileges required.'}), 403
         
         # Get expenses pending approval by this user
         expenses = list(mongo.db.expenses.find(
@@ -192,9 +204,9 @@ def approve_expense(expense_id):
         if not current_user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Check if user is manager or admin
-        if current_user['role'] not in ['Manager', 'Admin']:
-            return jsonify({'error': 'Access denied. Manager or Admin privileges required.'}), 403
+        # Check if user is manager
+        if current_user['role'] != 'Manager':
+            return jsonify({'error': 'Access denied. Manager privileges required.'}), 403
         
         # Get expense
         expense = mongo.db.expenses.find_one({'_id': ObjectId(expense_id)})

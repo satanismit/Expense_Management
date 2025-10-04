@@ -77,11 +77,11 @@ function AppContent() {
         }
       />
       
-      {/* Manager Routes - Managers and Admins can approve */}
+      {/* Manager Routes - Only Managers can approve */}
       <Route
         path="/pending-approvals"
         element={
-          <ProtectedRoute requiredRoles={['Manager', 'Admin']}>
+          <ProtectedRoute requiredRoles={['Manager']}>
             <PendingApprovals />
           </ProtectedRoute>
         }
