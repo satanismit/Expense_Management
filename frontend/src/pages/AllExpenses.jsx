@@ -50,7 +50,7 @@ const AllExpenses = () => {
       'submitted': 'bg-yellow-100 text-yellow-800',
       'approved': 'bg-green-100 text-green-800',
       'rejected': 'bg-red-100 text-red-800',
-      'pending': 'bg-blue-100 text-blue-800'
+      'pending': 'bg-gray-100 text-gray-800'
     };
 
     return (
@@ -74,7 +74,7 @@ const AllExpenses = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -100,7 +100,7 @@ const AllExpenses = () => {
               </div>
               <button
                 onClick={() => window.location.reload()}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                className="bg-primary hover:bg-accent-600 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
                 Refresh
               </button>
@@ -118,7 +118,7 @@ const AllExpenses = () => {
               <input
                 type="text"
                 placeholder="Search by description, employee, or category..."
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -126,7 +126,7 @@ const AllExpenses = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Status Filter</label>
               <select
-                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               >

@@ -38,7 +38,7 @@ const Navigation = () => {
     if (user?.role === 'Manager') {
       links.push({
         path: '/pending-approvals',
-        label: 'Pending Approvals',
+        label: 'Approvals',
         roles: ['Manager']
       });
     }
@@ -47,12 +47,17 @@ const Navigation = () => {
       links.push(
         {
           path: '/user-management',
-          label: 'User Management',
+          label: 'Manage Users',
           roles: ['Admin']
         },
         {
           path: '/all-expenses',
           label: 'All Expenses',
+          roles: ['Admin']
+        },
+        {
+          path: '/approval-settings',
+          label: 'Settings',
           roles: ['Admin']
         }
       );
@@ -71,10 +76,10 @@ const Navigation = () => {
         <Link
           key={link.path}
           to={link.path}
-          className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+          className={`group inline-flex items-center px-4 py-2 rounded-button text-sm font-medium transition-all duration-200 ${
             isActive(link.path)
-              ? 'border-blue-500 text-gray-900'
-              : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+              ? 'bg-primary text-white shadow-button'
+              : 'text-textLight hover:text-textDark hover:bg-gray-100'
           }`}
         >
           {link.label}
@@ -83,32 +88,48 @@ const Navigation = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-card border-b border-border shadow-card">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
+          <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Oddu Expense Manager</h1>
+              <div className="bg-gradient-to-r from-secondary to-primary w-10 h-10 rounded-lg flex items-center justify-center mr-3">
+                <span className="text-white text-xl font-bold">E</span>
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-textDark tracking-tight">ExpenseFlow</h1>
+                <p className="text-xs text-textLight">Enterprise Edition</p>
+              </div>
             </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="hidden lg:ml-8 lg:flex lg:space-x-2">
               {renderLinks()}
             </div>
           </div>
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <div className="text-sm text-gray-500">
-                {user?.name} ({user?.role})
-              </div>
+          
+          <div className="flex items-center space-x-4">
+            <div className="hidden sm:flex flex-col text-right">
+              <span className="text-sm font-medium text-textDark">{user?.name}</span>
+              <span className="text-xs text-textLight">{user?.role} • {user?.company_name}</span>
             </div>
-            <div className="ml-4">
-              <button
-                onClick={logout}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+              <span className="text-white text-sm font-semibold">
+                {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+              </span>
             </div>
+            <button
+              onClick={logout}
+              className="bg-secondary hover:bg-gray-800 text-white px-4 py-2 rounded-button text-sm font-medium transition-colors duration-200 shadow-button"
+            >
+              Sign Out
+            </button>
           </div>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation */}
+      <div className="lg:hidden border-t border-border">
+        <div className="px-4 py-2 space-y-1">
+          {renderLinks()}
         </div>
       </div>
     </nav>

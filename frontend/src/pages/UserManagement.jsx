@@ -77,7 +77,7 @@ const UserManagement = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -101,7 +101,7 @@ const UserManagement = () => {
             <div className="flex space-x-4">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                className="bg-primary hover:bg-accent-600 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
                 Add User
               </button>
@@ -160,7 +160,7 @@ const UserManagement = () => {
                         <select
                           value={usr.role}
                           onChange={(e) => handleRoleChange(usr._id, e.target.value)}
-                          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                           <option value="Employee">Employee</option>
                           <option value="Manager">Manager</option>
@@ -171,7 +171,7 @@ const UserManagement = () => {
                         <select
                           value={usr.manager_id || ''}
                           onChange={(e) => handleManagerChange(usr._id, e.target.value)}
-                          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                           <option value="">No Manager</option>
                           {managers
@@ -263,7 +263,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
               <input
                 type="text"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
@@ -274,7 +274,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
               <input
                 type="email"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -285,7 +285,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
               <input
                 type="password"
                 required
-                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
@@ -331,7 +331,7 @@ const CreateUserModal = ({ onClose, onUserCreated, managers }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-accent-600 disabled:opacity-50"
               >
                 {loading ? 'Creating...' : 'Create User'}
               </button>
