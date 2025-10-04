@@ -2,8 +2,13 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+const ProtectedRoute = ({ 
+  children, 
+  adminOnly = false, 
+  requiredRole = null, 
+  requiredRoles = null 
+}) => {
+  const { isAuthenticated, isAdmin, user, loading } = useAuth();
 
   if (loading) {
     return (
@@ -17,7 +22,18 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // Legacy adminOnly support
   if (adminOnly && !isAdmin()) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Single required role
+  if (requiredRole && user?.role !== requiredRole) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  // Multiple allowed roles
+  if (requiredRoles && !requiredRoles.includes(user?.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

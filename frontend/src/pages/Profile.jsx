@@ -1,11 +1,14 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import Navigation from '../components/Navigation';
 
 const Profile = () => {
   const { user, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,14 +17,6 @@ const Profile = () => {
               <h1 className="text-3xl font-bold text-gray-900">
                 Profile
               </h1>
-            </div>
-            <div>
-              <button
-                onClick={logout}
-                className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Logout
-              </button>
             </div>
           </div>
         </div>

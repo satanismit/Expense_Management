@@ -33,12 +33,8 @@ const Login = () => {
       
       login(user, access_token);
       
-      // Redirect based on role
-      if (user.role === 'Admin') {
-        navigate('/dashboard');
-      } else {
-        navigate('/profile');
-      }
+      // Redirect to dashboard for all users
+      navigate('/dashboard');
     } catch (error) {
       setError(error.response?.data?.error || 'Login failed. Please try again.');
     } finally {

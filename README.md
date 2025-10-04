@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Oddu - Full Stack User Management Application
 
 A complete full-stack application built with Flask (Python) backend, React frontend, and MongoDB database for company user management.
@@ -288,3 +289,6 @@ This project is created for educational purposes. Feel free to modify and use as
 ## Support
 
 For issues and questions, please check the troubleshooting section above or create an issue in the repository.
+=======
+# Expense_Management
+>>>>>>> 7f1da09c5f1c264b22c49a36f6b6e14829b2f2a5
