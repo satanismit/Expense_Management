@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { expenseAPI } from '../services/api';
 import Navigation from '../components/Navigation';
+import Loader from '../components/Loader';
 
 const PendingApprovals = () => {
   const [expenses, setExpenses] = useState([]);
@@ -64,7 +65,7 @@ const PendingApprovals = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
+        <Loader />
       </div>
     );
   }
